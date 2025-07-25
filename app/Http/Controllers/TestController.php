@@ -7,6 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class TestController extends Controller {
     public function hello() {
-        return view('hello');
+        return view('welcome');
     }
 }
