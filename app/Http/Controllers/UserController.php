@@ -45,9 +45,10 @@ class userController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(userModel $user_model)
+    public function show($id)
     {
-        //
+        $user = userModel::findOrFail($id);
+        return view('user.show', compact('user'));
     }
 
     /**
@@ -75,7 +76,6 @@ class userController extends Controller
         $user->password = bcrypt($request->input('password'));
         $user->update();
         return redirect()->route('list_user.index')->with('success', 'User updated successfully.');
-
     }
 
     /**

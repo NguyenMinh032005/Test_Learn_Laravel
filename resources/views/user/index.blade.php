@@ -22,15 +22,20 @@
             @foreach ($users as $user)
                 <tr>
                     <td>{{ $user->id }}</td>
-                    <td>{{ $user->name }}</td>
+                    <td><a href="{{ route('list_user.show', $user->id) }}">
+                            {{ $user->name }}
+                        </a></td>
                     <td>{{ $user->username }}</td>
                     <td>
                         <a href="{{ route('list_user.edit', $user->id) }}" class="btn btn-warning btn-sm">Sửa</a>
 
-                        <form action="{{ route('list_user.destroy', $user->id) }}" method="POST" style="display:inline-block;">
+                        <form action="{{ route('list_user.destroy', $user->id) }}" method="POST"
+                              style="display:inline-block;">
                             @csrf
                             @method('DELETE')
-                            <button onclick="return confirm('Bạn có chắc muốn xóa?')" class="btn btn-danger btn-sm">Xóa</button>
+                            <button onclick="return confirm('Bạn có chắc muốn xóa?')" class="btn btn-danger btn-sm">
+                                Xóa
+                            </button>
                         </form>
                     </td>
                 </tr>
