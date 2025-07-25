@@ -2,88 +2,76 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\userModel;
 use Illuminate\Http\Request;
 
-class userController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $users = userModel::all();
-        return view('user.index', compact('users'));
+class userController extends Controller {
+    public function index() {
+        $users = User::all();
+
+        return view( 'user.index', [ 'users' => $users ] );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('user.create');
+    public function create() {
+        return view( 'user.create' );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:list_user',
-            'password' => 'required|string',
-        ]);
-        $user = new userModel();
-        $user->name = $request->input('name');
-        $user->username = $request->input('username');
-        $user->password = bcrypt($request->input('password'));
+    public function store( Request $request ) {
+        $data           = $request->validate( [
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email',
+            'password' => 'required|string|min:8',
+        ],
+            [
+                'name.required'     => 'Bạn cần phải nhập Tên.',
+                'email.required'    => 'Bạn cần phải nhập email.',
+                'password.required' => 'Bạn cần phải nhập Password.',
+                'password.min'      => 'Password phải có ít nhất 8 ký tự.',
+            ] );
+        $user           = new User();
+        $user->name     = $data['name'];
+        $user->email    = $data['email'];
+        $user->password = bcrypt( $data['password'] );
         $user->save();
-        return redirect()->route('list_user.index')->with('success', 'User created successfully.');
+
+        return redirect()->route( 'list-user.index' )->with( 'success', 'User created successfully.' );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
-    {
-        $user = userModel::findOrFail($id);
-        return view('user.show', compact('user'));
+    public function show( User $user ) {
+
+        return view( 'user.show', compact( 'user' ) );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        $user = userModel::findOrFail($id);
-        return view('user.edit', compact('user'));
+    public function edit( User $user ) {
+        return view( 'user.edit', compact( 'user' ) );
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255',
-            'password' => 'required|string',
-        ]);
-        $user = userModel::findOrFail($id);
-        $user->name = $request->input('name');
-        $user->username = $request->input('username');
-        $user->password = bcrypt($request->input('password'));
+    public function update( Request $request, User $user ) {
+        $data           = $request->validate( [
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email',
+            'password' => !isset($request->password) || $request->password == '' ? 'nullable' : 'required|string|min:8',
+        ],
+            [
+                'name.required'     => 'Bạn cần phải nhập Tên.',
+                'email.required'    => 'Bạn cần phải nhập email.',
+                'password.required' => 'Bạn cần phải nhập Password.',
+                'password.min'      => 'Password phải có ít nhất 8 ký tự.',
+            ] );
+        $user->name     = $data['name'];
+        $user->email = $data['email'];
+        if(isset($request->password) && strlen($data['password']) > 8) {
+            $user->password = bcrypt( $data['password'] );
+        }
+
         $user->update();
-        return redirect()->route('list_user.index')->with('success', 'User updated successfully.');
+
+        return redirect()->route( 'list-user.index' )->with( 'success', 'User updated successfully.' );
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        userModel::destroy($id);
-        return redirect()->route('list_user.index')->with('success', 'User deleted successfully.');
+    public function destroy( User $user ) {
+        $user->delete();
     }
+
 }
